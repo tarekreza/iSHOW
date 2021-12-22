@@ -1,0 +1,26 @@
+ form {
+     margin-left: 10vw;
+     margin-right: 10vw;
+     margin-top: 5vw;
+ }
+ input{
+    width: 100%;
+    padding: 8px 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 1px solid rgba(206, 206, 206, 0.527);
+  border-radius: 8px;
+  background-color: #f3f2f2ad;
+  color: rgb(0, 0, 0);
+  }
+button{
+    background-color: #1f53ff;
+    border: none;
+    border-radius: 8px;
+    color: rgb(255, 255, 255);
+    padding: 10px;
+    text-decoration: none;
+    margin: 40px 0px;
+    cursor: pointer;
+    width: 100%;
+  }
