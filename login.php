@@ -1,31 +1,24 @@
 <?php
-
+session_start();
 require 'dbconnect.php';
 
-if (isset($_SESSION['login'])) {
-    $_SESSION['loginAlert'] = $_SESSION['name'] . " you are already logged in";
+if (isset($_SESSION["login"])) {
+    if ($_SESSION["login"]) {
+        header("Location:index.php");
+    }
 } else {
     if (isset($_POST["submit"])) {
-        $Username = $_POST["username"];
+        $Email = $_POST["email"];
         $Password = $_POST["password"];
-        if ($Username != null && $Password != null) {
-            $sql = "SELECT * FROM ishow where username='$Username' AND password =  '$Password'";
-            $result = mysqli_query($conn, $sql);
-            $name = mysqli_fetch_assoc($result);
-            $num = mysqli_num_rows($result);
-            if ($num > 0) {
-                $_SESSION["login"] = true;
-                $_SESSION['name'] = $name['name'];
-                header("Location:index.php");
-            } else {
-              $_SESSION['emailCheck'] = "Please enter valid email and password";
-            }
-        } else {
-            $_SESSION['R-field'] = "Please fill all required fields";
+        $login_obj = new login;
+        $login_obj->check_allfield($Email, $Password);
+        if ($_SESSION['allfield']) {
+            unset($_SESSION['allfield']);
+            $login_obj->check($Email, $Password);
         }
+
     }
 }
-
 ?>
 <!doctype html>
 <html lang="en">
@@ -60,28 +53,30 @@ if (isset($_SESSION['login'])) {
         </div>
       </div>
     </nav>
+    <div class="text-center">
     <h1><b>Login Here</b></h1>
 <!-- show alert -->
-    <h1><b>
+    <h3><b>
       <?php
-if (isset($_SESSION['R-field'])) {
-    echo $_SESSION['R-field'];
-    unset($_SESSION['R-field']);
+if (isset($_SESSION['allfield'])) {
+    if (!($_SESSION['allfield'])) {
+        echo "Please fill all required fields";
+        unset($_SESSION['allfield']);
+    }
 }
-if (isset($_SESSION['emailCheck'])) {
-    echo $_SESSION['emailCheck'];
-    unset($_SESSION['emailCheck']);
-}
-if (isset($_SESSION['loginAlert'])) {
-    echo $_SESSION['loginAlert'];
-    unset($_SESSION['loginAlert']);
+if (isset($_SESSION['login'])) {
+    if (!($_SESSION['login'])) {
+        echo "You entered wrong email or password";
+        unset($_SESSION['login']);
+    }
 }
 ?>
-    </b></h1>
+    </b></h3>
+    </div>
 <!-- FORM -->
 <form action="" method="POST">
-  <label for="">Username</label>
-  <input type="text" name="username" placeholder="Enter your username">
+  <label for="">email</label>
+  <input type="text" name="email" placeholder="Enter your email">
   <br>
   <label for="">password</label>
   <input type="password" name="password" placeholder="Enter your password">
@@ -91,3 +86,41 @@ if (isset($_SESSION['loginAlert'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   </body>
 </html>
+
+<?php
+class login
+{
+    public $dbconnection;
+
+    public function __construct()
+    {
+        // database connection
+        $dbobj = new dbconnect;
+        $this->dbconnection = $dbobj->connection();
+    }
+    public function check_allfield($email, $password)
+    {
+        if ($email != null && $password != null) {
+            $_SESSION['allfield'] = true;
+        } else {
+            $_SESSION['allfield'] = false;
+        }
+    }
+    public function check($email, $pass)
+    {
+        $sql = "SELECT * FROM ishow where email='$email' AND password =  '$pass'";
+        $result = mysqli_query($this->dbconnection, $sql);
+        $name = mysqli_fetch_assoc($result);
+        $num = mysqli_num_rows($result);
+        if ($num > 0) {
+            $_SESSION["login"] = true;
+            $_SESSION['name'] = $name['name'];
+            header("Location:index.php");
+        } else {
+            $_SESSION['login'] = false;
+        }
+    }
+
+}
+
+?>
