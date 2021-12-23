@@ -1,41 +1,31 @@
 <?php
+session_start();
 require 'dbconnect.php';
-$dbobj = new dbconnect;
-$value = $dbobj->connection();
 
 if (isset($_POST["submit"])) {
     $Name = $_POST["name"];
-    $Username = $_POST["username"];
     $Email = $_POST["email"];
     $Password = $_POST["password"];
     $Cpassword = $_POST["cpassword"];
-    if ($Name != null && $Username != null && $Email != null && $Password != null) {
-        $sql = "SELECT * FROM ishow where email='$Email'";
-        $check = $value->query($sql);
-        $num = mysqli_num_rows($check);
-        if ($num >= 1) {
-            $_SESSION['checkAccount'] = "You already have an account with this email";
-        } else {
-            if ($Password === $Cpassword) {
-                if (filter_var($Email, FILTER_VALIDATE_EMAIL)) {
-                    $sql = "INSERT INTO ishow (name,username, email, password) VALUES ('$Name','$Username','$Email','$Password')";
 
-                    if ($value->query($sql)) {
-                        header("Location:login.php");
-                    }
-                } else {
-                    $_SESSION['emailCheck'] = "Please enter a valid email";
+    $signup_obj = new signup;
+
+    $signup_obj->check_allfield($Name, $Email, $Password, $Cpassword);
+    if ($_SESSION['allfield']) {
+        unset($_SESSION['allfield']);
+        $signup_obj->check_unique_email($Email);
+        if (isset($_SESSION['checkAccount'])) {
+            if ($_SESSION['checkAccount']) {
+                unset($_SESSION['checkAccount']);
+                $signup_obj->password_check($Password, $Cpassword);
+                if ($_SESSION['passwordCheck']) {
+                    unset($_SESSION['passwordCheck']);
+                    $signup_obj->store_data($Name, $Email, $Password);
                 }
-            } else {
-                $_SESSION['passwordCheck'] = "Password didn't match";
             }
         }
-    } else {
-        $_SESSION['allfields'] = 'Please fill all required fields';
     }
-
 }
-
 ?>
 
 <!doctype html>
@@ -68,46 +58,55 @@ if (isset($_POST["submit"])) {
               <a class="nav-link" href="signup.php">signup</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="login.php">User Login</a>
+              <a class="nav-link" href="login.php">Login</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
     <div class="text-center">
-    <h1><b>Signup Here</b></h1>
+      <h1><b>Signup Here</b></h1>
+      <h3><b>
+          <?php
+if (isset($_SESSION['allfield'])) {
+    if (!($_SESSION['allfield'])) {
 
-    <h1><b>
-
-<?php
-
-if (isset($_SESSION['allfields'])) {
-    echo $_SESSION['allfields'];
-    unset($_SESSION['allfields']);
+        echo 'Please fill all required fields';
+        unset($_SESSION['allfield']);
+    }
 }
-if (isset($_SESSION['checkAccount'])) {
-    echo $_SESSION['checkAccount'];
-    unset($_SESSION['checkAccount']);
-}
-
 if (isset($_SESSION['passwordCheck'])) {
-    echo $_SESSION['passwordCheck'];
-    unset($_SESSION['passwordCheck']);
+    if (!$_SESSION['passwordCheck']) {
+        echo "Password didn't match";
+        unset($_SESSION['passwordCheck']);
+    }
 }
 if (isset($_SESSION['emailCheck'])) {
-    echo $_SESSION['emailCheck'];
-    unset($_SESSION['emailCheck']);
+    if (!$_SESSION['emailCheck']) {
+        echo "Please enter a valid email";
+        unset($_SESSION['emailCheck']);
+    }
+}
+if (isset($_SESSION['checkAccount'])) {
+    if (!$_SESSION['checkAccount']) {
+        echo "You already have an account with this email";
+        unset($_SESSION['checkAccount']);
+    }
+}
+if (isset($_SESSION['insert_error'])) {
+    if (!$_SESSION['insert_error']) {
+        echo "Can't insert data into database. please contact out support team";
+        unset($_SESSION['insert_error']);
+    }
 }
 ?>
-  </b></h1>
-  </div>
+  </b></h3>
+</div>
+
     <!-- FORM -->
     <form action="" method="POST">
         <label for="">Name</label>
         <input type="text" name="name" placeholder="Enter your Name">
-        <br>
-        <label for="">Username</label>
-        <input type="text" name="username" placeholder="Enter your username">
         <br>
         <label for="">Email</label>
         <input type="email" name="email" placeholder="Enter your email">
@@ -125,7 +124,65 @@ if (isset($_SESSION['emailCheck'])) {
   </body>
 </html>
 
+<?php
+class signup
+{
+    public $dbconnection;
 
+    public function __construct()
+    {
+        // database connection
+        $dbobj = new dbconnect;
+        $this->dbconnection = $dbobj->connection();
 
+    }
 
-<!-- no change -->
+    // check name, email, password and confirm password are null or not
+    public function check_allfield($name, $email, $password, $Cpassword)
+    {
+
+        if ($name != null && $email != null && $password != null && $Cpassword) {
+            $_SESSION['allfield'] = true;
+        } else {
+            $_SESSION['allfield'] = false;
+        }
+    }
+    public function check_unique_email($email)
+    {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            // $_SESSION['emailCheck'] = true;
+            // TODO:unset($_SESSION['emailCheck']);
+            $sql = "SELECT email FROM ishow where email='$email'";
+            $result = $this->dbconnection->query($sql);
+            $num = mysqli_num_rows($result);
+            if ($num == 0) {
+                // if user don't have any account with this email then checkaccount = true
+                $_SESSION['checkAccount'] = true;
+            } else {
+                $_SESSION['checkAccount'] = false;
+            }
+        } else {
+            $_SESSION['emailCheck'] = false;
+        }
+    }
+    // check passwords and confirm passwords are same or not
+    public function password_check($pass, $cpass)
+    {
+        if ($pass == $cpass) {
+            $_SESSION['passwordCheck'] = true;
+        } else {
+            $_SESSION['passwordCheck'] = false;
+        }
+    }
+    public function store_data($name, $email, $pass)
+    {
+        $sql = "INSERT INTO ishow (name, email, password) VALUES ('$name','$email','$pass')";
+        if ($this->dbconnection->query($sql)) {
+            header("Location:login.php");
+        } else {
+            $_SESSION['insert_error'] = false;
+        }
+    }
+}
+
+?>

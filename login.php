@@ -1,6 +1,7 @@
 <?php
 
 require 'dbconnect.php';
+
 if (isset($_SESSION['login'])) {
     $_SESSION['loginAlert'] = $_SESSION['name'] . " you are already logged in";
 } else {
