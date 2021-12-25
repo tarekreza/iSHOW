@@ -64,43 +64,84 @@ if (isset($_POST["submit"])) {
         </div>
       </div>
     </nav>
-    <div class="text-center">
-      <h1><b>Signup Here</b></h1>
-      <h3><b>
-          <?php
-if (isset($_SESSION['allfield'])) {
-    if (!($_SESSION['allfield'])) {
 
-        echo 'Please fill all required fields';
-        unset($_SESSION['allfield']);
-    }
+<?php
+if (isset($_SESSION['allfield'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['allfield'])) {
+
+    echo 'Please fill all required fields';
+    unset($_SESSION['allfield']);
 }
-if (isset($_SESSION['passwordCheck'])) {
-    if (!$_SESSION['passwordCheck']) {
-        echo "Password didn't match";
-        unset($_SESSION['passwordCheck']);
-    }
-}
-if (isset($_SESSION['emailCheck'])) {
-    if (!$_SESSION['emailCheck']) {
-        echo "Please enter a valid email";
-        unset($_SESSION['emailCheck']);
-    }
-}
-if (isset($_SESSION['checkAccount'])) {
-    if (!$_SESSION['checkAccount']) {
-        echo "You already have an account with this email";
-        unset($_SESSION['checkAccount']);
-    }
-}
-if (isset($_SESSION['insert_error'])) {
-    if (!$_SESSION['insert_error']) {
-        echo "Can't insert data into database. please contact out support team";
-        unset($_SESSION['insert_error']);
-    }
+    ?>
+</div>
+<?php
 }
 ?>
-  </b></h3>
+
+<?php
+if (isset($_SESSION['passwordCheck'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['passwordCheck'])) {
+
+    echo "Password didn't match";
+    unset($_SESSION['passwordCheck']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+
+<?php
+if (isset($_SESSION['emailCheck'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['emailCheck'])) {
+
+    echo "Please enter a valid email";
+    unset($_SESSION['emailCheck']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+
+<?php
+if (isset($_SESSION['checkAccount'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['checkAccount'])) {
+
+    echo "You already have an account with this email";
+    unset($_SESSION['checkAccount']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+
+<?php
+if (isset($_SESSION['insert_error'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['insert_error'])) {
+
+    echo "Can't insert data into database. please contact out support team";
+    unset($_SESSION['insert_error']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+
+    <div class="text-center">
+      <h1><b>Signup Here</b></h1>
 </div>
 
     <!-- FORM -->

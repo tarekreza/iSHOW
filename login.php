@@ -10,7 +10,7 @@ if (isset($_SESSION["login"])) {
     if (isset($_POST["submit"])) {
         $Email = $_POST["email"];
         $Password = $_POST["password"];
-        $login_obj = new login;
+        $login_obj = new login();
         $login_obj->check_allfield($Email, $Password);
         if ($_SESSION['allfield']) {
             unset($_SESSION['allfield']);
@@ -53,25 +53,38 @@ if (isset($_SESSION["login"])) {
         </div>
       </div>
     </nav>
-    <div class="text-center">
-    <h1><b>Login Here</b></h1>
-<!-- show alert -->
-    <h3><b>
-      <?php
-if (isset($_SESSION['allfield'])) {
-    if (!($_SESSION['allfield'])) {
-        echo "Please fill all required fields";
-        unset($_SESSION['allfield']);
-    }
+
+    <?php
+if (isset($_SESSION['allfield'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['allfield'])) {
+
+    echo 'Please fill all required fields';
+    unset($_SESSION['allfield']);
 }
-if (isset($_SESSION['login'])) {
-    if (!($_SESSION['login'])) {
-        echo "You entered wrong email or password";
-        unset($_SESSION['login']);
-    }
+    ?>
+</div>
+<?php
 }
 ?>
-    </b></h3>
+
+<?php
+if (isset($_SESSION['login'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['login'])) {
+
+  echo "You entered wrong email or password";
+    unset($_SESSION['login']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+    <div class="text-center">
+    <h1><b>Login Here</b></h1>
     </div>
 <!-- FORM -->
 <form action="" method="POST">
@@ -114,9 +127,10 @@ class login
         $num = mysqli_num_rows($result);
         if ($num > 0) {
             $_SESSION["login"] = true;
+            $_SESSION['id'] = $name['id'];
             $_SESSION['name'] = $name['name'];
             $_SESSION['email'] = $name['email'];
-            $_SESSION['password'] = $name['password'];
+        $_SESSION['password'] = $name['password'];
             header("Location:index.php");
         } else {
             $_SESSION['login'] = false;
