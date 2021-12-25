@@ -115,6 +115,8 @@ class login
         if ($num > 0) {
             $_SESSION["login"] = true;
             $_SESSION['name'] = $name['name'];
+            $_SESSION['email'] = $name['email'];
+            $_SESSION['password'] = $name['password'];
             header("Location:index.php");
         } else {
             $_SESSION['login'] = false;
