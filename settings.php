@@ -56,7 +56,7 @@ if (isset($_SESSION["login"])) {
               <a class="nav-link active" aria-current="page" href="index.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="Profile.php">Profile</a>
+              <a class="nav-link" href="settings.php">Settings</a>
             </li>
             <li class="nav-item">
               <a class="nav-link"href="logout.php">Logout</a>
@@ -96,7 +96,7 @@ echo $_SESSION['password'];
 
         </div>
 <!-- FORM -->
-<form action="profile.php" method="POST">
+<form action="settings.php" method="POST">
 <label for="">Name</label>
     <input type="text" name="change_name" placeholder="<?php echo $_SESSION['name']; ?>">
         <br>
