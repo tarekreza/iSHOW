@@ -1,13 +1,3 @@
-<?php
-session_start();
-if ($_SESSION["login"]) {
-    $_SESSION['homeName'] = "Hi ".$_SESSION['name'];
-}
-else{
-  header("Location:login.php");
-}
-
-?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -31,10 +21,10 @@ else{
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+              <a class="nav-link" href="index.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link"  href="profile.php">Profile</a>
+              <a class="nav-link active" aria-current="page" href="profile.php">Profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="settings.php">Settings</a>
@@ -46,17 +36,25 @@ else{
         </div>
       </div>
     </nav>
-    <h1><b>Home page</b></h1>
-    <h1><b>
-<?php
-    if (isset($_SESSION['homeName'])) {
-    echo $_SESSION['homeName'];
-}
-?>
-  </b></h1>
+    <h1><b>Profile</b></h1>
    
+ <form class = "my-5" method="POST" enctype="multipart/form-data">
+   <input type="file" name="image" class = "form-control">
+   <button type="submit" name="submit">Submit</button>
+
+
+ </form>
+
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
   </body>
 </html>
+
+<?php
+
+  if (isset($_POST['submit'])) {
+    $profile_picture = $_FILES['image'];
+  }
+
+?>

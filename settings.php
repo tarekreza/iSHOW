@@ -53,10 +53,13 @@ if (isset($_SESSION["login"])) {
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+              <a class="nav-link" href="index.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="settings.php">Settings</a>
+              <a class="nav-link" href="profile.php">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="settings.php">Settings</a>
             </li>
             <li class="nav-item">
               <a class="nav-link"href="logout.php">Logout</a>
