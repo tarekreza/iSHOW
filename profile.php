@@ -1,3 +1,19 @@
+<?php
+session_start();
+require 'dbconnect.php';
+
+  $id = $_SESSION['id'];
+  $obj = new profile();
+
+  if (isset($_POST['submit'])) {
+    $profile_picture = $_FILES['image']['tmp_name'];
+    $name = time().'.jpg';
+    $name_path = 'img/'. $name;
+    $obj->insert_img_into_db($name,$id);
+    move_uploaded_file($profile_picture,$name_path);
+
+  }
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -36,25 +52,44 @@
         </div>
       </div>
     </nav>
-    <h1><b>Profile</b></h1>
    
- <form class = "my-5" method="POST" enctype="multipart/form-data">
+ <form class = "my-5" action="" method="POST" enctype="multipart/form-data">
    <input type="file" name="image" class = "form-control">
    <button type="submit" name="submit">Submit</button>
+  </form>
 
-
- </form>
+  <div class="text-center">
+<!-- show profile picture -->
+    <!--                            GOT ERROR                             -->
+    <img src="img/<?php $_SESSION['profile_picture']?>" height="200" width ="200" alt="Profile picture"> 
+    <!--                            GOT ERROR                             -->
+    <!-- show name -->
+    <h1><b><?=$_SESSION['name']?></b></h1>
+ </div>
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
   </body>
 </html>
 
 <?php
-
-  if (isset($_POST['submit'])) {
-    $profile_picture = $_FILES['image'];
+  class profile{
+    public $dbconnection;
+    public function __construct()
+    {
+        // database connection
+        $dbobj = new dbconnect;
+        $this->dbconnection = $dbobj->connection();
+    }
+    // insert name into db
+    function insert_img_into_db($name,$id){
+      $sql = "UPDATE ishow SET profile_picture = '$name' WHERE id = '$id'";
+      $this->dbconnection->query($sql);
+      // get name from db 
+      $sql = "SELECT * FROM ishow where id='$id'";
+        $result = $this->dbconnection->query($sql);
+        $name = mysqli_fetch_assoc($result);
+        $_SESSION['profile_picture'] = $name['profile_picture'];
+    }
   }
-
 ?>

@@ -131,6 +131,8 @@ class login
             $_SESSION['name'] = $name['name'];
             $_SESSION['email'] = $name['email'];
         $_SESSION['password'] = $name['password'];
+        $_SESSION['profile_picture'] = $name['profile_picture'];
+
             header("Location:index.php");
         } else {
             $_SESSION['login'] = false;

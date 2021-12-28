@@ -8,22 +8,22 @@ if (isset($_SESSION["login"])) {
             $changedName = $_POST["change_name"];
             $changedEmail = $_POST["change_email"];
             $changedPassword = $_POST["change_password"];
-            if (filter_var($changedEmail, FILTER_VALIDATE_EMAIL)) {
-                $id = $_SESSION['id'];
-                $obj = new profile();
-                if ($changedName != null) {
-                    $obj->name($changedName, $id);
-                }
-                if ($changedEmail != null) {
-                    $obj->email($changedEmail, $id);
-                }
-                if ($changedPassword != null) {
-                    $obj->password($changedPassword, $id);
-                }
+            $id = $_SESSION['id'];
+            $obj = new settings;
+            if ($changedEmail != null) {
+            if (filter_var($changedEmail, FILTER_VALIDATE_EMAIL)) {  
+                  $obj->check_unique_email($changedEmail,$id);
             } else {
                 if ($changedEmail != null) {
                     $_SESSION['emailERROR'] = true;
                 }
+            }
+          }
+            if ($changedName != null) {
+                $obj->name($changedName, $id);
+            }
+            if ($changedPassword != null) {
+                $obj->password($changedPassword, $id);
             }
         }
     }
@@ -69,15 +69,30 @@ if (isset($_SESSION["login"])) {
       </div>
     </nav>
     <?php
-if (isset($_SESSION['emailERROR'])) { ?>
+if (isset($_SESSION['emailERROR'])) {?>
     <div class="alert alert-danger" role="alert">
 <?php
-    if ($_SESSION['emailERROR']) {
-        echo "Please enter correct email address <br>";
-        unset($_SESSION['emailERROR']);
-    }
-?>
+if ($_SESSION['emailERROR']) {
+    echo "Please enter correct email address <br>";
+    unset($_SESSION['emailERROR']);
+}
+
+    ?>
 </div>
+<?php
+}
+?>
+    <?php
+if (isset($_SESSION['already_have_account'] )) {?>
+    <div class="alert alert-danger" role="alert">
+<?php
+if ($_SESSION['already_have_account']) {
+    echo "You already have an account with this email <br>";
+    unset($_SESSION['already_have_account'] );
+}
+    ?>
+</div>
+
 <?php
 }
 ?>
@@ -115,13 +130,26 @@ echo $_SESSION['password'];
   </body>
 </html>
 <?php
-class profile
-{
+class settings
+{public $dbconnection;
     public function __construct()
     {
         // database connection
         $dbobj = new dbconnect;
         $this->dbconnection = $dbobj->connection();
+    }
+    
+    public function check_unique_email($email,$id){
+      $sql = "SELECT email FROM ishow where email='$email'";
+            $result = $this->dbconnection->query($sql);
+            $num = mysqli_num_rows($result);
+            if ($num == 0) {
+                $this->email($email, $id);
+            }
+            else{
+              $_SESSION['already_have_account'] = true;
+            }
+
     }
     public function update($id)
     {
