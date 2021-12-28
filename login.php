@@ -129,6 +129,7 @@ class login
             $_SESSION["login"] = true;
             $_SESSION['id'] = $name['id'];
             $_SESSION['name'] = $name['name'];
+            $_SESSION['username'] = $name['username'];
             $_SESSION['email'] = $name['email'];
         $_SESSION['password'] = $name['password'];
         $_SESSION['profile_picture'] = $name['profile_picture'];

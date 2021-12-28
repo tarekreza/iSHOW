@@ -4,23 +4,30 @@ require 'dbconnect.php';
 
 if (isset($_POST["submit"])) {
     $Name = $_POST["name"];
+    $Username = $_POST["username"];
     $Email = $_POST["email"];
     $Password = $_POST["password"];
     $Cpassword = $_POST["cpassword"];
 
     $signup_obj = new signup;
 
-    $signup_obj->check_allfield($Name, $Email, $Password, $Cpassword);
+    $signup_obj->check_allfield($Name, $Username, $Email, $Password, $Cpassword);
     if ($_SESSION['allfield']) {
         unset($_SESSION['allfield']);
         $signup_obj->check_unique_email($Email);
         if (isset($_SESSION['checkAccount'])) {
             if ($_SESSION['checkAccount']) {
                 unset($_SESSION['checkAccount']);
-                $signup_obj->password_check($Password, $Cpassword);
-                if ($_SESSION['passwordCheck']) {
-                    unset($_SESSION['passwordCheck']);
-                    $signup_obj->store_data($Name, $Email, $Password);
+                $signup_obj->check_unique_username($Username);
+                if (isset($_SESSION['checkUsername'])) {
+                    if ($_SESSION['checkUsername']) {
+                        unset($_SESSION['checkUsername']);
+                        $signup_obj->password_check($Password, $Cpassword);
+                        if ($_SESSION['passwordCheck']) {
+                            unset($_SESSION['passwordCheck']);
+                            $signup_obj->store_data($Name, $Username, $Email, $Password);
+                        }
+                    }
                 }
             }
         }
@@ -111,6 +118,21 @@ if (!($_SESSION['emailCheck'])) {
 ?>
 
 <?php
+if (isset($_SESSION['checkUsername'])) {?>
+        <div class="alert alert-danger" role="alert">
+            <?php
+if (!($_SESSION['checkUsername'])) {
+
+    echo "This username already used by someone";
+    unset($_SESSION['checkUsername']);
+}
+    ?>
+</div>
+<?php
+}
+?>
+
+<?php
 if (isset($_SESSION['checkAccount'])) {?>
         <div class="alert alert-danger" role="alert">
             <?php
@@ -149,6 +171,9 @@ if (!($_SESSION['insert_error'])) {
         <label for="">Name</label>
         <input type="text" name="name" placeholder="Enter your Name">
         <br>
+        <label for="">username</label>
+        <input type="text" name="username" placeholder="Enter your username">
+        <br>
         <label for="">Email</label>
         <input type="email" name="email" placeholder="Enter your email">
         <br>
@@ -179,10 +204,10 @@ class signup
     }
 
     // check name, email, password and confirm password are null or not
-    public function check_allfield($name, $email, $password, $Cpassword)
+    public function check_allfield($name, $username, $email, $password, $Cpassword)
     {
 
-        if ($name != null && $email != null && $password != null && $Cpassword) {
+        if ($name != null && $username != null && $email != null && $password != null && $Cpassword) {
             $_SESSION['allfield'] = true;
         } else {
             $_SESSION['allfield'] = false;
@@ -206,6 +231,20 @@ class signup
             $_SESSION['emailCheck'] = false;
         }
     }
+    public function check_unique_username($username)
+    {
+        $sql = "SELECT username FROM ishow where username='$username'";
+        $result = $this->dbconnection->query($sql);
+        $num = mysqli_num_rows($result);
+        if ($num == 0) {
+            // if user don't have any account with this email then checkaccount = true
+            $_SESSION['checkUsername'] = true;
+            $_SESSION['username'] = $username;
+
+        } else {
+            $_SESSION['checkUsername'] = false;
+        }
+    }
     // check passwords and confirm passwords are same or not
     public function password_check($pass, $cpass)
     {
@@ -215,9 +254,9 @@ class signup
             $_SESSION['passwordCheck'] = false;
         }
     }
-    public function store_data($name, $email, $pass)
+    public function store_data($name, $username, $email, $pass)
     {
-        $sql = "INSERT INTO ishow (name, email, password) VALUES ('$name','$email','$pass')";
+        $sql = "INSERT INTO ishow (name, username, email, password) VALUES ('$name','$username','$email','$pass')";
         if ($this->dbconnection->query($sql)) {
             header("Location:login.php");
         } else {
